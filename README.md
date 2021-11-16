@@ -6,9 +6,13 @@ that is using Qt/KF5.
 ## Building xdg-desktop-portal-lxqt
 
 ### Dependencies:
- - xdg-desktop-portal (runtime dependency)
- - Qt 5 (build dependency)
- - KDE Frameworks - KWindowSystem
+- Build + Runtime
+  - Qt 5
+  - KDE Frameworks - KWindowSystem
+- Runtime only
+  - xdg-desktop-portal
+  - lxqt-qtplugin
+  - libfm-qt
 
 ### Build instructions:
 ```
