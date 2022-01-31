@@ -210,23 +210,21 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        // TODO: spawn the proper file dialog
         QScopedPointer<QFileDialog, QScopedPointerDeleteLater> fileDialog{new QFileDialog{nullptr, title}};
         Utils::setParentWindow(fileDialog.data(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(directory ? QFileDialog::Directory : (multipleFiles ? QFileDialog::ExistingFiles : QFileDialog::ExistingFile));
-        // TODO: acceptLabel
+        fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
-        /* TODO: filters
         bool bMimeFilters = false;
         if (!mimeTypeFilters.isEmpty()) {
-            fileDialog->m_fileWidget->setMimeFilter(mimeTypeFilters, selectedMimeTypeFilter);
+            fileDialog->setMimeTypeFilters(mimeTypeFilters);
+            fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
             bMimeFilters = true;
         } else if (!nameFilters.isEmpty()) {
-            fileDialog->m_fileWidget->setFilter(nameFilters.join(QLatin1Char('\n')));
+            fileDialog->setNameFilters(nameFilters);
         }
-        */
 
         /* TODO: options
         if (optionsWidget) {
@@ -255,18 +253,16 @@ namespace LXQt
             }
             */
 
-            /* TODO: filters
             // try to map current filter back to one of the predefined ones
             QString selectedFilter;
             if (bMimeFilters) {
-                selectedFilter = fileDialog->m_fileWidget->currentMimeFilter();
+                selectedFilter = fileDialog->selectedMimeTypeFilter();
             } else {
-                selectedFilter = fileDialog->m_fileWidget->filterWidget()->currentText();
+                selectedFilter = fileDialog->selectedNameFilter();
             }
             if (allFilters.contains(selectedFilter)) {
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
-            */
 
             return 0;
         }
@@ -330,7 +326,6 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        // TODO: spawn the proper file dialog
         QScopedPointer<QFileDialog, QScopedPointerDeleteLater> fileDialog{new QFileDialog{nullptr, title, currentFolder}};
         Utils::setParentWindow(fileDialog.data(), parent_window);
         fileDialog->setWindowTitle(title);
@@ -342,24 +337,20 @@ namespace LXQt
             fileDialog->selectFile(currentFile);
         }
 
-        /* TODO: ?
         if (!currentName.isEmpty()) {
-            const QUrl url = fileDialog->m_fileWidget->baseUrl();
-            fileDialog->m_fileWidget->setSelectedUrl(QUrl::fromLocalFile(QStringLiteral("%1/%2").arg(url.toDisplayString(QUrl::StripTrailingSlash), currentName)));
+            fileDialog->selectFile(currentName);
         }
-        */
 
-        // TODO: acceptLabel
+        fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
-        /* TODO: filters
         bool bMimeFilters = false;
         if (!mimeTypeFilters.isEmpty()) {
-            fileDialog->m_fileWidget->setMimeFilter(mimeTypeFilters, selectedMimeTypeFilter);
+            fileDialog->setMimeTypeFilters(mimeTypeFilters);
+            fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
             bMimeFilters = true;
         } else if (!nameFilters.isEmpty()) {
-            fileDialog->m_fileWidget->setFilter(nameFilters.join(QLatin1Char('\n')));
+            fileDialog->setNameFilters(nameFilters);
         }
-        */
 
         /* TODO: options
         if (optionsWidget) {
@@ -382,18 +373,16 @@ namespace LXQt
             }
             */
 
-            /* TODO: filters
             // try to map current filter back to one of the predefined ones
             QString selectedFilter;
             if (bMimeFilters) {
-                selectedFilter = fileDialog->m_fileWidget->currentMimeFilter();
+                selectedFilter = fileDialog->selectedMimeTypeFilter();
             } else {
-                selectedFilter = fileDialog->m_fileWidget->filterWidget()->currentText();
+                selectedFilter = fileDialog->selectedNameFilter();
             }
             if (allFilters.contains(selectedFilter)) {
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
-            */
 
             return 0;
         }
@@ -506,7 +495,7 @@ namespace LXQt
                 if (!filterStrings.isEmpty()) {
                     QString userVisibleName = filterList.userVisibleName;
                     const QString filterString = filterStrings.join(QLatin1Char(' '));
-                    const QString nameFilter = QStringLiteral("%1|%2").arg(filterString, userVisibleName);
+                    const QString nameFilter = QStringLiteral("%2 (%1)").arg(filterString, userVisibleName);
                     nameFilters << nameFilter;
                     allFilters[filterList.userVisibleName] = filterList;
                 }
@@ -521,7 +510,7 @@ namespace LXQt
                     // make the relevant entry the first one in the list of filters,
                     // since that is the one that gets preselected by KFileWidget::setFilter
                     QString userVisibleName = filterList.userVisibleName;
-                    QString nameFilter = QStringLiteral("%1|%2").arg(filterStruct.filterString, userVisibleName);
+                    QString nameFilter = QStringLiteral("%2 (%1)").arg(filterStruct.filterString, userVisibleName);
                     nameFilters.removeAll(nameFilter);
                     nameFilters.push_front(nameFilter);
                 } else {
