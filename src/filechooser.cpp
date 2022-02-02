@@ -38,7 +38,7 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QUrl>
-#include <QFileDialog>
+#include <libfm-qt/filedialog.h>
 
 // Keep in sync with qflatpakfiledialog from flatpak-platform-plugin
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Filter)
@@ -210,31 +210,32 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        QScopedPointer<QFileDialog, QScopedPointerDeleteLater> fileDialog{new QFileDialog{nullptr, title}};
+        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr}};
         Utils::setParentWindow(fileDialog.data(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(directory ? QFileDialog::Directory : (multipleFiles ? QFileDialog::ExistingFiles : QFileDialog::ExistingFile));
-        fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
+        if (!acceptLabel.isEmpty())
+            fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
         bool bMimeFilters = false;
         if (!mimeTypeFilters.isEmpty()) {
             fileDialog->setMimeTypeFilters(mimeTypeFilters);
             fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
             bMimeFilters = true;
-        } else if (!nameFilters.isEmpty()) {
+        } else {
             fileDialog->setNameFilters(nameFilters);
         }
 
-        /* TODO: options
         if (optionsWidget) {
-            fileDialog->m_fileWidget->setCustomWidget({}, optionsWidget.get());
+            if (auto layout = fileDialog->layout()) {
+                layout->addWidget(optionsWidget.get());
+            }
         }
-        */
 
         if (fileDialog->exec() == QDialog::Accepted) {
             QStringList files;
-            for (const auto & url : fileDialog->selectedUrls()) {
+            for (const auto & url : fileDialog->selectedFiles()) {
                 files << url.toDisplayString();
             }
 
@@ -246,12 +247,10 @@ namespace LXQt
             results.insert(QStringLiteral("uris"), files);
             results.insert(QStringLiteral("writable"), true);
 
-            /* TODO: options
             if (optionsWidget) {
                 QVariant choices = EvaluateSelectedChoices(checkboxes, comboboxes);
                 results.insert(QStringLiteral("choices"), choices);
             }
-            */
 
             // try to map current filter back to one of the predefined ones
             QString selectedFilter;
@@ -287,8 +286,8 @@ namespace LXQt
 
         bool modalDialog = true;
         QString currentName;
-        QString currentFolder;
-        QString currentFile;
+        std::string currentFolder;
+        QUrl currentFile;
         QStringList nameFilters;
         QStringList mimeTypeFilters;
         QString selectedMimeTypeFilter;
@@ -306,11 +305,11 @@ namespace LXQt
         }
 
         if (options.contains(QStringLiteral("current_folder"))) {
-            currentFolder = QFile::decodeName(options.value(QStringLiteral("current_folder")).toByteArray());
+            currentFolder = options.value(QStringLiteral("current_folder")).toString().toStdString();
         }
 
         if (options.contains(QStringLiteral("current_file"))) {
-            currentFile = QFile::decodeName(options.value(QStringLiteral("current_file")).toByteArray());
+            currentFile = QUrl::fromEncoded(options.value(QStringLiteral("current_file")).toByteArray());
         }
 
         ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
@@ -326,52 +325,59 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        QScopedPointer<QFileDialog, QScopedPointerDeleteLater> fileDialog{new QFileDialog{nullptr, title, currentFolder}};
+        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr, Fm::FilePath::fromUri(currentFolder.c_str())}};
         Utils::setParentWindow(fileDialog.data(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(QFileDialog::AnyFile);
         fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+        if (!acceptLabel.isEmpty())
+            fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
-        if (!currentFile.isEmpty()) {
+        if (currentFile.isValid()) {
             fileDialog->selectFile(currentFile);
+        } else if (!currentName.isEmpty()) {
+            // Fm::FileDialog::directory() returns url w/o trailing slash, so QUrl treats it as file instead of a directory
+            // => we need to workaround it to get correct file with QUrl::resolved()
+            const QUrl dir = fileDialog->directory();
+            QString dir_name = dir.fileName();
+            if (!dir_name.isEmpty())
+            {
+                dir_name += QLatin1Char('/');
+                currentName.prepend(dir_name);
+            }
+            QUrl relative_file;
+            relative_file.setPath(currentName);
+            fileDialog->selectFile(dir.resolved(relative_file));
         }
-
-        if (!currentName.isEmpty()) {
-            fileDialog->selectFile(currentName);
-        }
-
-        fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
         bool bMimeFilters = false;
         if (!mimeTypeFilters.isEmpty()) {
             fileDialog->setMimeTypeFilters(mimeTypeFilters);
             fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
             bMimeFilters = true;
-        } else if (!nameFilters.isEmpty()) {
+        } else {
             fileDialog->setNameFilters(nameFilters);
         }
 
-        /* TODO: options
         if (optionsWidget) {
-            fileDialog->m_fileWidget->setCustomWidget(optionsWidget.get());
+            if (auto layout = fileDialog->layout()) {
+                layout->addWidget(optionsWidget.get());
+            }
         }
-        */
 
         if (fileDialog->exec() == QDialog::Accepted) {
             QStringList files;
-            for (const auto & url : fileDialog->selectedUrls()) {
+            for (const auto & url : fileDialog->selectedFiles()) {
                 files << url.toDisplayString();
                 break;
             }
             results.insert(QStringLiteral("uris"), files);
 
-            /* TODO: options
             if (optionsWidget) {
                 QVariant choices = EvaluateSelectedChoices(checkboxes, comboboxes);
                 results.insert(QStringLiteral("choices"), choices);
             }
-            */
 
             // try to map current filter back to one of the predefined ones
             QString selectedFilter;

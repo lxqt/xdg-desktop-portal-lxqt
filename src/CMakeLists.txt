@@ -14,6 +14,7 @@ target_link_libraries(xdg-desktop-portal-lxqt
     Qt::Core
     Qt::DBus
     Qt::Widgets
+    fm-qt
     KF5::WindowSystem
 )
 

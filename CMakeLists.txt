@@ -5,6 +5,7 @@ set(PROJECT_VERSION "0.0.1")
 project(xdg-desktop-portal-lxqt VERSION ${PROJECT_VERSION})
 
 set(QT_MIN_VERSION "5.15.0")
+set(LIBFMQT_MINIMUM_VERSION "1.0.0")
 set(KF5_MIN_VERSION "5.78")
 
 set(CMAKE_AUTOMOC on)
@@ -17,7 +18,8 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     DBus
     Widgets
 )
-
+find_package(Qt5X11Extras ${QT_MINIMUM_VERSION} REQUIRED)  # seems to be required by fm-qt
+find_package(fm-qt ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
 find_package(KF5WindowSystem ${KF5_MIN_VERSION} REQUIRED)
 
 add_subdirectory(data)
