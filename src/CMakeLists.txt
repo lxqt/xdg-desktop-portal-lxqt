@@ -1,8 +1,13 @@
 set(SRCS
     utils.cpp
+    filedialoghelper.cpp
     filechooser.cpp
     desktopportal.cpp
     main.cpp
+)
+
+include_directories(
+    ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
 )
 
 add_executable(xdg-desktop-portal-lxqt ${SRCS})
