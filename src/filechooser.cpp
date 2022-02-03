@@ -38,6 +38,9 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QUrl>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDBusObjectPath>
 #include <libfm-qt/filedialog.h>
 
 // Keep in sync with qflatpakfiledialog from flatpak-platform-plugin
@@ -218,6 +221,10 @@ namespace LXQt
         if (!acceptLabel.isEmpty())
             fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
+        if (mLastVisitedDirs.count(parent_window) > 0) {
+            fileDialog->setDirectory(mLastVisitedDirs[parent_window]);
+        }
+
         bool bMimeFilters = false;
         if (!mimeTypeFilters.isEmpty()) {
             fileDialog->setMimeTypeFilters(mimeTypeFilters);
@@ -263,6 +270,8 @@ namespace LXQt
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
 
+            mLastVisitedDirs[parent_window] = fileDialog->directory();
+
             return 0;
         }
 
@@ -286,7 +295,7 @@ namespace LXQt
 
         bool modalDialog = true;
         QString currentName;
-        std::string currentFolder;
+        QUrl currentFolder;
         QUrl currentFile;
         QStringList nameFilters;
         QStringList mimeTypeFilters;
@@ -305,11 +314,11 @@ namespace LXQt
         }
 
         if (options.contains(QStringLiteral("current_folder"))) {
-            currentFolder = options.value(QStringLiteral("current_folder")).toString().toStdString();
+            currentFolder = QUrl::fromLocalFile(options.value(QStringLiteral("current_folder")).toString());
         }
 
         if (options.contains(QStringLiteral("current_file"))) {
-            currentFile = QUrl::fromEncoded(options.value(QStringLiteral("current_file")).toByteArray());
+            currentFile = QUrl::fromLocalFile(options.value(QStringLiteral("current_file")).toString());
         }
 
         ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
@@ -325,7 +334,7 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr, Fm::FilePath::fromUri(currentFolder.c_str())}};
+        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr}};
         Utils::setParentWindow(fileDialog.data(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
@@ -333,6 +342,12 @@ namespace LXQt
         fileDialog->setAcceptMode(QFileDialog::AcceptSave);
         if (!acceptLabel.isEmpty())
             fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
+
+        if (currentFolder.isValid()) {
+            fileDialog->setDirectory(currentFolder);
+        } else if (mLastVisitedDirs.count(parent_window) > 0) {
+            fileDialog->setDirectory(mLastVisitedDirs[parent_window]);
+        }
 
         if (currentFile.isValid()) {
             fileDialog->selectFile(currentFile);
@@ -389,6 +404,8 @@ namespace LXQt
             if (allFilters.contains(selectedFilter)) {
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
+
+            mLastVisitedDirs[parent_window] = fileDialog->directory();
 
             return 0;
         }

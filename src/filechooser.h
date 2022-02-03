@@ -29,11 +29,11 @@
 
 #pragma once
 
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDBusAbstractAdaptor>
-#include <QDBusObjectPath>
-#include <QDialog>
+
+class QCheckBox;
+class QComboBox;
+class QDBusObjectPath;
 
 namespace LXQt
 {
@@ -100,5 +100,7 @@ namespace LXQt
                 QMap<QString, FilterList> &allFilters,
                 QString &selectedMimeTypeFilter);
 
+    private:
+        QMap<QString, QUrl> mLastVisitedDirs;
     };
 }
