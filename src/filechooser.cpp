@@ -29,6 +29,7 @@
 
 #include "filechooser.h"
 #include "utils.h"
+#include "filedialoghelper.h"
 
 #include <QDBusArgument>
 #include <QDBusMetaType>
@@ -213,8 +214,8 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr}};
-        Utils::setParentWindow(fileDialog.data(), parent_window);
+        auto fileDialog = FileDialogHelper::createFileDialogHelper();
+        Utils::setParentWindow(&fileDialog->dialog(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(directory ? QFileDialog::Directory : (multipleFiles ? QFileDialog::ExistingFiles : QFileDialog::ExistingFile));
@@ -235,12 +236,12 @@ namespace LXQt
         }
 
         if (optionsWidget) {
-            if (auto layout = fileDialog->layout()) {
+            if (auto layout = fileDialog->dialog().layout()) {
                 layout->addWidget(optionsWidget.get());
             }
         }
 
-        if (fileDialog->exec() == QDialog::Accepted) {
+        if (fileDialog->execResult() == QDialog::Accepted) {
             QStringList files;
             for (const auto & url : fileDialog->selectedFiles()) {
                 files << url.toDisplayString();
@@ -334,8 +335,8 @@ namespace LXQt
             optionsWidget.reset(CreateChoiceControls(optionList, checkboxes, comboboxes));
         }
 
-        QScopedPointer<Fm::FileDialog, QScopedPointerDeleteLater> fileDialog{new Fm::FileDialog{nullptr}};
-        Utils::setParentWindow(fileDialog.data(), parent_window);
+        auto fileDialog = FileDialogHelper::createFileDialogHelper();
+        Utils::setParentWindow(&fileDialog->dialog(), parent_window);
         fileDialog->setWindowTitle(title);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(QFileDialog::AnyFile);
@@ -376,12 +377,12 @@ namespace LXQt
         }
 
         if (optionsWidget) {
-            if (auto layout = fileDialog->layout()) {
+            if (auto layout = fileDialog->dialog().layout()) {
                 layout->addWidget(optionsWidget.get());
             }
         }
 
-        if (fileDialog->exec() == QDialog::Accepted) {
+        if (fileDialog->execResult() == QDialog::Accepted) {
             QStringList files;
             for (const auto & url : fileDialog->selectedFiles()) {
                 files << url.toDisplayString();
