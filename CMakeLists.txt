@@ -21,6 +21,7 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
 find_package(Qt5X11Extras ${QT_MINIMUM_VERSION} REQUIRED)  # seems to be required by fm-qt
 find_package(fm-qt ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
 find_package(KF5WindowSystem ${KF5_MIN_VERSION} REQUIRED)
+find_package(Exif REQUIRED)
 
 add_subdirectory(data)
 add_subdirectory(src)
