@@ -20,14 +20,14 @@ that is using Qt/KF5/libfm-qt.
 ```
 $ mkdir build && cd build
 $ cmake .. [your_options]
-$ make -j5
+$ make 
 # make install
 ```
 ### Use LXQt filedialog in applications
 
-* Firefox:  In the address bar `about:config`,`widget.use-xdg-desktop-portal` has to be set to `true`.
-* Thunderbird: Preferences > Configuration Editor - as above
-* Other GTK applications can be started with `GTK_USE_PORTAL=1 application`
+* Firefox version 98 and higher:  Open in the address bar `about:config`, search for "portal" and set both `widget.use-xdg-desktop-portal.file-picker` and `widget.use-xdg-desktop-portal.mime-handler`  from `2` to `1`. Older versions of firefox are using the same setting as thunderbird.
+* Thunderbird: Preferences > Configuration Editor `widget.use-xdg-desktop-portal` has to be set to `true`. 
+* Some other GTK applications can be started with `GTK_USE_PORTAL=1 application`
 
 A general use of `GTK_USE_PORTAL=1` in `~/.profile` or `/etc/profile` can lead to issues and
  is not recommended.
