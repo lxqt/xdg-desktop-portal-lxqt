@@ -1,3 +1,7 @@
+xdg-desktop-portal-lxqt-0.3.0 / 2022-11-05
+==========================================
+ * Updated and improved `README.md`.
+
 xdg-desktop-portal-lxqt-0.2.0 / 2022-04-15
 ==========================================
  * Use Fm:FileDialogHelper (apps using `xdg-portal` will behave like the native Qt apps under LXQt).
