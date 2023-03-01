@@ -38,6 +38,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QLoggingCategory>
+#include <QMimeDatabase>
 #include <QUrl>
 #include <QCheckBox>
 #include <QComboBox>
@@ -183,8 +184,7 @@ namespace LXQt
         bool multipleFiles = false;
         QUrl currentFolder;
         QStringList nameFilters;
-        QStringList mimeTypeFilters;
-        QString selectedMimeTypeFilter;
+        QString selectedNameFilter;
         // mapping between filter strings and actual filters
         QMap<QString, FilterList> allFilters;
 
@@ -206,7 +206,7 @@ namespace LXQt
             currentFolder = QUrl::fromLocalFile(options.value(QStringLiteral("current_folder")).toString());
         }
 
-        ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
+        ExtractFilters(options, nameFilters, allFilters, selectedNameFilter);
 
         // for handling of options - choices
         std::unique_ptr<QWidget> optionsWidget;
@@ -233,13 +233,9 @@ namespace LXQt
             fileDialog->setDirectory(mLastVisitedDirs[parent_window]);
         }
 
-        bool bMimeFilters = false;
-        if (!mimeTypeFilters.isEmpty()) {
-            fileDialog->setMimeTypeFilters(mimeTypeFilters);
-            fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
-            bMimeFilters = true;
-        } else {
+        if (!nameFilters.isEmpty()) {
             fileDialog->setNameFilters(nameFilters);
+            fileDialog->selectNameFilter(selectedNameFilter);
         }
 
         bool bHasOptions = false;
@@ -270,12 +266,7 @@ namespace LXQt
             }
 
             // try to map current filter back to one of the predefined ones
-            QString selectedFilter;
-            if (bMimeFilters) {
-                selectedFilter = fileDialog->selectedMimeTypeFilter();
-            } else {
-                selectedFilter = fileDialog->selectedNameFilter();
-            }
+            QString selectedFilter = fileDialog->selectedNameFilter();
             if (allFilters.contains(selectedFilter)) {
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
@@ -308,8 +299,7 @@ namespace LXQt
         QUrl currentFolder;
         QUrl currentFile;
         QStringList nameFilters;
-        QStringList mimeTypeFilters;
-        QString selectedMimeTypeFilter;
+        QString selectedNameFilter;
         // mapping between filter strings and actual filters
         QMap<QString, FilterList> allFilters;
 
@@ -331,7 +321,7 @@ namespace LXQt
             currentFile = QUrl::fromLocalFile(options.value(QStringLiteral("current_file")).toString());
         }
 
-        ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
+        ExtractFilters(options, nameFilters, allFilters, selectedNameFilter);
 
         // for handling of options - choices
         std::unique_ptr<QWidget> optionsWidget;
@@ -376,13 +366,9 @@ namespace LXQt
             fileDialog->selectFile(dir.resolved(relative_file));
         }
 
-        bool bMimeFilters = false;
-        if (!mimeTypeFilters.isEmpty()) {
-            fileDialog->setMimeTypeFilters(mimeTypeFilters);
-            fileDialog->selectMimeTypeFilter(selectedMimeTypeFilter);
-            bMimeFilters = true;
-        } else {
+        if (!nameFilters.isEmpty()) {
             fileDialog->setNameFilters(nameFilters);
+            fileDialog->selectNameFilter(selectedNameFilter);
         }
 
         bool bHasOptions = false;
@@ -407,12 +393,7 @@ namespace LXQt
             }
 
             // try to map current filter back to one of the predefined ones
-            QString selectedFilter;
-            if (bMimeFilters) {
-                selectedFilter = fileDialog->selectedMimeTypeFilter();
-            } else {
-                selectedFilter = fileDialog->selectedNameFilter();
-            }
+            QString selectedFilter = fileDialog->selectedNameFilter();
             if (allFilters.contains(selectedFilter)) {
                 results.insert(QStringLiteral("current_filter"), QVariant::fromValue<FilterList>(allFilters.value(selectedFilter)));
             }
@@ -510,9 +491,8 @@ namespace LXQt
 
     void FileChooserPortal::ExtractFilters(const QVariantMap &options,
             QStringList &nameFilters,
-            QStringList &mimeTypeFilters,
             QMap<QString, FilterList> &allFilters,
-            QString &selectedMimeTypeFilter)
+            QString &selectedNameFilter)
     {
         if (options.contains(QStringLiteral("filters"))) {
             const FilterListList filterListList = qdbus_cast<FilterListList>(options.value(QStringLiteral("filters")));
@@ -522,17 +502,15 @@ namespace LXQt
                     if (filterStruct.type == 0) {
                         filterStrings << filterStruct.filterString;
                     } else {
-                        mimeTypeFilters << filterStruct.filterString;
-                        allFilters[filterStruct.filterString] = filterList;
+                        filterStrings << NameFiltersForMimeType(filterStruct.filterString);
                     }
                 }
 
                 if (!filterStrings.isEmpty()) {
-                    QString userVisibleName = filterList.userVisibleName;
                     const QString filterString = filterStrings.join(QLatin1Char(' '));
-                    const QString nameFilter = QStringLiteral("%2 (%1)").arg(filterString, userVisibleName);
+                    const QString nameFilter = QStringLiteral("%2 (%1)").arg(filterString, filterList.userVisibleName);
                     nameFilters << nameFilter;
-                    allFilters[filterList.userVisibleName] = filterList;
+                    allFilters[nameFilter] = filterList;
                 }
             }
         }
@@ -540,20 +518,40 @@ namespace LXQt
         if (options.contains(QStringLiteral("current_filter"))) {
             FilterList filterList = qdbus_cast<FilterList>(options.value(QStringLiteral("current_filter")));
             if (filterList.filters.size() == 1) {
+                QStringList filterStrings;
                 Filter filterStruct = filterList.filters.at(0);
                 if (filterStruct.type == 0) {
+                    filterStrings << filterStruct.filterString;
+                } else {
+                    filterStrings << NameFiltersForMimeType(filterStruct.filterString);
+                }
+
+                if (!filterStrings.isEmpty()) {
                     // make the relevant entry the first one in the list of filters,
                     // since that is the one that gets preselected by KFileWidget::setFilter
-                    QString userVisibleName = filterList.userVisibleName;
-                    QString nameFilter = QStringLiteral("%2 (%1)").arg(filterStruct.filterString, userVisibleName);
+                    const QString filterString = filterStrings.join(QLatin1Char(' '));
+                    const QString nameFilter = QStringLiteral("%2 (%1)").arg(filterString, filterList.userVisibleName);
                     nameFilters.removeAll(nameFilter);
                     nameFilters.push_front(nameFilter);
-                } else {
-                    selectedMimeTypeFilter = filterStruct.filterString;
+                    selectedNameFilter = nameFilter;
                 }
             } else {
                 qCDebug(XdgDesktopPortalLxqtFileChooser) << "Ignoring 'current_filter' parameter with 0 or multiple filters specified.";
             }
         }
+    }
+
+    QStringList FileChooserPortal::NameFiltersForMimeType(const QString &mimeType)
+    {
+        QMimeDatabase db;
+        QMimeType mime(db.mimeTypeForName(mimeType));
+
+        if (mime.isValid()) {
+            if (mime.isDefault()) {
+                return QStringList("*");
+            }
+            return mime.globPatterns();
+        }
+        return QStringList();
     }
 }

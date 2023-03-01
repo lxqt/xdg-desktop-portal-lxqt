@@ -51,7 +51,6 @@ namespace LXQt
         inline void setWindowTitle(const QString & title) { options()->setWindowTitle(title); }
         inline void setModal(bool modal) { dialog().setModal(modal); }
         inline void setLabelText(QFileDialog::DialogLabel label, const QString &text) { options()->setLabelText(static_cast<QFileDialogOptions::DialogLabel>(label), text); };
-        inline void setMimeTypeFilters(const QStringList &filters) { options()->setMimeTypeFilters(filters); }
         inline void setNameFilters(const QStringList &filters) { options()->setNameFilters(filters); }
         inline void setAcceptMode(QFileDialog::AcceptMode mode) { options()->setAcceptMode(static_cast<QFileDialogOptions::AcceptMode>(mode)); }
         int execResult();

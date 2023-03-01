@@ -96,9 +96,10 @@ namespace LXQt
 
         static void ExtractFilters(const QVariantMap &options,
                 QStringList &nameFilters,
-                QStringList &mimeTypeFilters,
                 QMap<QString, FilterList> &allFilters,
-                QString &selectedMimeTypeFilter);
+                QString &selectedNameFilter);
+
+        static QStringList NameFiltersForMimeType(const QString &mimeType);
 
     private:
         QMap<QString, QUrl> mLastVisitedDirs;
