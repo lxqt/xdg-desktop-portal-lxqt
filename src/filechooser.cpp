@@ -204,7 +204,7 @@ namespace LXQt
         ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
 
         // for handling of options - choices
-        QScopedPointer<QWidget> optionsWidget;
+        std::unique_ptr<QWidget> optionsWidget;
         // to store IDs for choices along with corresponding comboboxes/checkboxes
         QMap<QString, QCheckBox *> checkboxes;
         QMap<QString, QComboBox *> comboboxes;
@@ -235,9 +235,11 @@ namespace LXQt
             fileDialog->setNameFilters(nameFilters);
         }
 
+        bool bHasOptions = false;
         if (optionsWidget) {
             if (auto layout = fileDialog->dialog().layout()) {
-                layout->addWidget(optionsWidget.get());
+                layout->addWidget(optionsWidget.release());
+                bHasOptions = true;
             }
         }
 
@@ -255,7 +257,7 @@ namespace LXQt
             results.insert(QStringLiteral("uris"), files);
             results.insert(QStringLiteral("writable"), true);
 
-            if (optionsWidget) {
+            if (bHasOptions) {
                 QVariant choices = EvaluateSelectedChoices(checkboxes, comboboxes);
                 results.insert(QStringLiteral("choices"), choices);
             }
@@ -325,7 +327,7 @@ namespace LXQt
         ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
 
         // for handling of options - choices
-        QScopedPointer<QWidget> optionsWidget;
+        std::unique_ptr<QWidget> optionsWidget;
         // to store IDs for choices along with corresponding comboboxes/checkboxes
         QMap<QString, QCheckBox *> checkboxes;
         QMap<QString, QComboBox *> comboboxes;
@@ -376,9 +378,11 @@ namespace LXQt
             fileDialog->setNameFilters(nameFilters);
         }
 
+        bool bHasOptions = false;
         if (optionsWidget) {
             if (auto layout = fileDialog->dialog().layout()) {
-                layout->addWidget(optionsWidget.get());
+                layout->addWidget(optionsWidget.release());
+                bHasOptions = true;
             }
         }
 
@@ -390,7 +394,7 @@ namespace LXQt
             }
             results.insert(QStringLiteral("uris"), files);
 
-            if (optionsWidget) {
+            if (bHasOptions) {
                 QVariant choices = EvaluateSelectedChoices(checkboxes, comboboxes);
                 results.insert(QStringLiteral("choices"), choices);
             }
