@@ -181,6 +181,7 @@ namespace LXQt
         bool directory = false;
         bool modalDialog = true;
         bool multipleFiles = false;
+        QUrl currentFolder;
         QStringList nameFilters;
         QStringList mimeTypeFilters;
         QString selectedMimeTypeFilter;
@@ -199,6 +200,10 @@ namespace LXQt
 
         if (options.contains(QStringLiteral("directory"))) {
             directory = options.value(QStringLiteral("directory")).toBool();
+        }
+
+        if (options.contains(QStringLiteral("current_folder"))) {
+            currentFolder = QUrl::fromLocalFile(options.value(QStringLiteral("current_folder")).toString());
         }
 
         ExtractFilters(options, nameFilters, mimeTypeFilters, allFilters, selectedMimeTypeFilter);
@@ -222,7 +227,9 @@ namespace LXQt
         if (!acceptLabel.isEmpty())
             fileDialog->setLabelText(QFileDialog::Accept, acceptLabel);
 
-        if (mLastVisitedDirs.count(parent_window) > 0) {
+        if (currentFolder.isValid()) {
+            fileDialog->setDirectory(currentFolder);
+        } else if (mLastVisitedDirs.count(parent_window) > 0) {
             fileDialog->setDirectory(mLastVisitedDirs[parent_window]);
         }
 
