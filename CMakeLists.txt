@@ -4,23 +4,23 @@ set(PROJECT_VERSION "0.5.0")
 
 project(xdg-desktop-portal-lxqt VERSION ${PROJECT_VERSION})
 
-set(QT_MIN_VERSION "5.15.0")
-set(LIBFMQT_MINIMUM_VERSION "1.4.0")
-set(KF5_MIN_VERSION "5.78")
+set(QT_MIN_VERSION "6.6.0")
+set(LIBFMQT_MINIMUM_VERSION "2.0.0")
+set(KF6_MIN_VERSION "6.0.0")
 
 set(CMAKE_AUTOMOC on)
 
 include(FeatureSummary)
 include(GNUInstallDirs)
 
-find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
+find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Core
     DBus
     Widgets
 )
 find_package(Qt5X11Extras ${QT_MINIMUM_VERSION} REQUIRED)  # seems to be required by fm-qt
-find_package(fm-qt ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
-find_package(KF5WindowSystem ${KF5_MIN_VERSION} REQUIRED)
+find_package(fm-qt6 ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
+find_package(KF6WindowSystem ${KF6_MIN_VERSION} REQUIRED)
 
 add_subdirectory(data)
 add_subdirectory(src)

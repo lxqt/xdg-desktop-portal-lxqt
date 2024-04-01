@@ -7,11 +7,11 @@ that is using Qt/KF5/libfm-qt.
 
 ### Dependencies:
 - Build + Runtime
-  - Qt 5
+  - Qt 6
   - KDE Frameworks - KWindowSystem
   - libfm-qt
 - Runtime only
-  - Qt 5
+  - Qt 6
   - KDE Frameworks - KWindowSystem
   - xdg-desktop-portal
   - libfm-qt
@@ -20,13 +20,13 @@ that is using Qt/KF5/libfm-qt.
 ```
 $ mkdir build && cd build
 $ cmake .. [your_options]
-$ make 
+$ make
 # make install
 ```
 ### Use LXQt filedialog in applications
 
-* Firefox version 98 and higher:  Open in the address bar `about:config`, search for "portal" and set both `widget.use-xdg-desktop-portal.file-picker` and `widget.use-xdg-desktop-portal.mime-handler`  from `2` to `1`. 
-* Thunderbird: Preferences > Configuration Editor `widget.use-xdg-desktop-portal` has to be set to `1`. 
+* Firefox version 98 and higher:  Open in the address bar `about:config`, search for "portal" and set both `widget.use-xdg-desktop-portal.file-picker` and `widget.use-xdg-desktop-portal.mime-handler`  from `2` to `1`.
+* Thunderbird: Preferences > Configuration Editor `widget.use-xdg-desktop-portal` has to be set to `1`.
 * Some other GTK applications can be started with `GTK_USE_PORTAL=1 application`
 * To use the LXQt file dialog if more desktop-portals are installed:
  `~/.config/xdg-desktop-portal/lxqt-portals.conf`
