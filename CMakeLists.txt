@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(PROJECT_VERSION "0.5.0")
+set(PROJECT_VERSION "1.0.0")
 
 project(xdg-desktop-portal-lxqt VERSION ${PROJECT_VERSION})
 
