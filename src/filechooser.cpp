@@ -43,7 +43,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDBusObjectPath>
-#include <libfm-qt/filedialog.h>
+#include <libfm-qt6/filedialog.h>
 
 // Keep in sync with qflatpakfiledialog from flatpak-platform-plugin
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Filter)

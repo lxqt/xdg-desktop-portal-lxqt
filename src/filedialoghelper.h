@@ -25,8 +25,8 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#include <libfm-qt/filedialoghelper.h>
-#include <libfm-qt/filedialog.h>
+#include <libfm-qt6/filedialoghelper.h>
+#include <libfm-qt6/filedialog.h>
 #include <memory>
 #include <QFileDialog>
 
