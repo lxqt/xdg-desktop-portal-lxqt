@@ -1,3 +1,10 @@
+xdg-desktop-portal-lxqt-1.0.0 / 2024-04-17
+==========================================
+ * Support `current_folder` when opening files.
+ * Transfer ownership of options widget.
+ * Convert mimetype filters to name filters.
+ * Ported to Qt6.
+
 xdg-desktop-portal-lxqt-0.5.0 / 2023-11-05
 ==========================================
  * Made it depending on libfm-qt-1.4.0 and bumped the version.
