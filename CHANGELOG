@@ -1,3 +1,7 @@
+xdg-desktop-portal-lxqt-1.0.1 / 2024-04-18
+==========================================
+ * Removed the redundant `qt5x11extra` dependency.
+
 xdg-desktop-portal-lxqt-1.0.0 / 2024-04-17
 ==========================================
  * Support `current_folder` when opening files.
