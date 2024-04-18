@@ -18,7 +18,6 @@ find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     DBus
     Widgets
 )
-find_package(Qt5X11Extras ${QT_MINIMUM_VERSION} REQUIRED)  # seems to be required by fm-qt
 find_package(fm-qt6 ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
 find_package(KF6WindowSystem ${KF6_MIN_VERSION} REQUIRED)
 
