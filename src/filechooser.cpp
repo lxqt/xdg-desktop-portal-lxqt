@@ -164,6 +164,22 @@ namespace LXQt
     {
     }
 
+    // The portal may send us null terminated strings. Make sure to strip the extranous \0
+    // in favor of the implicit \0.
+    // QByteArrays are implicitly terminated already.
+    static QUrl decodeFileName(const QByteArray &name)
+    {
+        QByteArray decodedName = name;
+        while (decodedName.endsWith('\0')) {
+            decodedName.chop(1);
+        }
+        QString str = QFile::decodeName(decodedName);
+        if (!str.isEmpty()) {
+            return QUrl::fromLocalFile(str);
+        }
+        return QUrl();
+    }
+
     uint FileChooserPortal::OpenFile(const QDBusObjectPath &handle,
             const QString &app_id,
             const QString &parent_window,
@@ -203,7 +219,7 @@ namespace LXQt
         }
 
         if (options.contains(QStringLiteral("current_folder"))) {
-            currentFolder = QUrl::fromLocalFile(options.value(QStringLiteral("current_folder")).toString());
+            currentFolder = decodeFileName(options.value(QStringLiteral("current_folder")).toByteArray());
         }
 
         ExtractFilters(options, nameFilters, allFilters, selectedNameFilter);
@@ -314,11 +330,11 @@ namespace LXQt
         }
 
         if (options.contains(QStringLiteral("current_folder"))) {
-            currentFolder = QUrl::fromLocalFile(options.value(QStringLiteral("current_folder")).toString());
+            currentFolder = decodeFileName(options.value(QStringLiteral("current_folder")).toByteArray());
         }
 
         if (options.contains(QStringLiteral("current_file"))) {
-            currentFile = QUrl::fromLocalFile(options.value(QStringLiteral("current_file")).toString());
+            currentFile = decodeFileName(options.value(QStringLiteral("current_file")).toByteArray());
         }
 
         ExtractFilters(options, nameFilters, allFilters, selectedNameFilter);
