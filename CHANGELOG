@@ -1,3 +1,7 @@
+xdg-desktop-portal-lxqt-1.0.2 / 2024-05-04
+==========================================
+ * Fixed the initial path (the credit goes to the KDE team for their solution in `xdg-desktop-portal-kde`).
+
 xdg-desktop-portal-lxqt-1.0.1 / 2024-04-18
 ==========================================
  * Removed the redundant `qt5x11extra` dependency.
