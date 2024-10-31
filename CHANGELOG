@@ -1,3 +1,7 @@
+xdg-desktop-portal-lxqt-1.1.0 / 2024-11-05
+==========================================
+ * Added the conf file `lxqt-portals.conf`.
+
 xdg-desktop-portal-lxqt-1.0.2 / 2024-05-04
 ==========================================
  * Fixed the initial path (the credit goes to the KDE team for their solution in `xdg-desktop-portal-kde`).
