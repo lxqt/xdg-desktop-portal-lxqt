@@ -1,3 +1,3 @@
 [D-BUS Service]
 Name=org.freedesktop.impl.portal.desktop.lxqt
-Exec=/bin/sh -c 'env QT_QPA_PLATFORMTHEME=lxqt @CMAKE_INSTALL_FULL_LIBEXECDIR@/xdg-desktop-portal-lxqt'
+Exec=/bin/sh -c 'QT_QPA_PLATFORMTHEME=lxqt exec @CMAKE_INSTALL_FULL_LIBEXECDIR@/xdg-desktop-portal-lxqt'
