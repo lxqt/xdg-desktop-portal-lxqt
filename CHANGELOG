@@ -1,3 +1,7 @@
+xdg-desktop-portal-lxqt-1.2.0 / 2025-04-17
+==========================================
+ * Don't fork a child process in the portal's service.
+
 xdg-desktop-portal-lxqt-1.1.0 / 2024-11-05
 ==========================================
  * Added the conf file `lxqt-portals.conf`.
