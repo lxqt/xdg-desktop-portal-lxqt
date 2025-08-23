@@ -1,0 +1,10 @@
+[Unit]
+Description=Portal service (LXQT implementation)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+Environment="QT_QPA_PLATFORMTHEME=lxqt"
+BusName=org.freedesktop.impl.portal.desktop.lxqt
+ExecStart=@CMAKE_INSTALL_FULL_LIBEXECDIR@/xdg-desktop-portal-lxqt
