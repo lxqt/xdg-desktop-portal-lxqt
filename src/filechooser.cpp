@@ -238,6 +238,7 @@ namespace LXQt
         auto fileDialog = FileDialogHelper::createFileDialogHelper();
         Utils::setParentWindow(&fileDialog->dialog(), parent_window);
         fileDialog->setWindowTitle(title);
+        fileDialog->setWindowModality(Qt::WindowModal);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(directory ? QFileDialog::Directory : (multipleFiles ? QFileDialog::ExistingFiles : QFileDialog::ExistingFile));
         if (!acceptLabel.isEmpty())
@@ -353,6 +354,7 @@ namespace LXQt
         auto fileDialog = FileDialogHelper::createFileDialogHelper();
         Utils::setParentWindow(&fileDialog->dialog(), parent_window);
         fileDialog->setWindowTitle(title);
+        fileDialog->setWindowModality(Qt::WindowModal);
         fileDialog->setModal(modalDialog);
         fileDialog->setFileMode(QFileDialog::AnyFile);
         fileDialog->setAcceptMode(QFileDialog::AcceptSave);
