@@ -39,4 +39,10 @@ void Utils::setParentWindow(QWidget *w, const QString &parent_window)
         w->setAttribute(Qt::WA_NativeWindow, true);
         KWindowSystem::setMainWindow(w->windowHandle(), parent_window.mid(4).toULongLong(nullptr, 16));
     }
+    if (parent_window.startsWith((QLatin1String("wayland:")))) {
+        if (!w->window()->windowHandle()) {
+            w->window()->winId(); // create QWindow
+        }
+        KWindowSystem::setMainWindow(w->window()->windowHandle(), parent_window.mid(strlen("wayland:")));
+    }
 }
