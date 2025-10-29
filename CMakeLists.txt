@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.18.0)
 
-set(PROJECT_VERSION "1.2.0")
+set(PROJECT_VERSION "1.3.0")
 
 project(xdg-desktop-portal-lxqt VERSION ${PROJECT_VERSION})
 
 set(QT_MIN_VERSION "6.6.0")
-set(LIBFMQT_MINIMUM_VERSION "2.2.0")
+set(LIBFMQT_MINIMUM_VERSION "2.3.0")
 set(KF6_MIN_VERSION "6.0.0")
 
 set(CMAKE_AUTOMOC on)
