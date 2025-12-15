@@ -1,7 +1,7 @@
 # xdg-desktop-portal-lxqt
 
 A backend implementation for [xdg-desktop-portal](http://github.com/flatpak/xdg-desktop-portal)
-that is using Qt/KF5/libfm-qt.
+that is using Qt/KF6/libfm-qt.
 
 ## Building xdg-desktop-portal-lxqt
 
