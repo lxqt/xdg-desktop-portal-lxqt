@@ -40,3 +40,14 @@ void Utils::setParentWindow(QWidget *w, const QString &parent_window)
         KWindowSystem::setMainWindow(w->windowHandle(), parent_window.mid(4).toULongLong(nullptr, 16));
     }
 }
+
+void Utils::convertGtkMnemonic(QString &label)
+{
+    // Mnemonic underlines (GTK style) use '_', but Qt uses '&'. Escape literal '&'s
+    // and transform the first mnemonic underline to the Qt equivalent.
+    label.replace(QChar::fromLatin1('&'), QStringLiteral("&&"));
+    const int mnemonicPos = label.indexOf(QChar::fromLatin1('_'));
+    if (mnemonicPos != -1) {
+        label.replace(mnemonicPos, 1, QChar::fromLatin1('&'));
+    }
+}

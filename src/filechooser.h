@@ -31,8 +31,6 @@
 
 #include <QDBusAbstractAdaptor>
 
-class QCheckBox;
-class QComboBox;
 class QDBusObjectPath;
 
 namespace LXQt
@@ -55,20 +53,6 @@ namespace LXQt
         };
         using FilterListList = QList<FilterList>;
 
-        struct Choice {
-            QString id;
-            QString value;
-        };
-        using Choices = QList<Choice>;
-
-        struct Option {
-            QString id;
-            QString label;
-            Choices choices;
-            QString initialChoiceId;
-        };
-        using OptionList = QList<Option>;
-
         explicit FileChooserPortal(QObject *parent);
         ~FileChooserPortal();
 
@@ -88,10 +72,6 @@ namespace LXQt
                 QVariantMap &results);
 
     private:
-        static QWidget *CreateChoiceControls(const OptionList &optionList, QMap<QString, QCheckBox *> &checkboxes, QMap<QString, QComboBox *> &comboboxes);
-
-        static QVariant EvaluateSelectedChoices(const QMap<QString, QCheckBox *> &checkboxes, const QMap<QString, QComboBox *> &comboboxes);
-
         static QString ExtractAcceptLabel(const QVariantMap &options);
 
         static void ExtractFilters(const QVariantMap &options,
