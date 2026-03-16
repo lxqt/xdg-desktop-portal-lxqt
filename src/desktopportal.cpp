@@ -27,6 +27,7 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
+#include "access.h"
 #include "desktopportal.h"
 #include "filechooser.h"
 
@@ -34,6 +35,7 @@ namespace LXQt
 {
     DesktopPortal::DesktopPortal(QObject *parent)
         : QObject(parent)
+        , m_access{new AccessPortal{this}}
         , m_fileChooser{new FileChooserPortal{this}}
     {
     }

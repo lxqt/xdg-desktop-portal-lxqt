@@ -4,10 +4,9 @@
  * LXQt - a lightweight, Qt based, desktop toolset
  * https://lxqt-project.org
  *
- * Copyright: 2018 Alexander Volkov <a.volkov@rusbitech.ru>
- * Copyright: 2021~ LXQt team
+ * Copyright: 2026~ LXQt team
  * Authors:
- *   Palo Kisa <palo.kisa@gmail.com>
+ *   Basil Crow <me@basilcrow.com>
  *
  * This program or library is free software; you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
@@ -28,13 +27,27 @@
 
 #pragma once
 
-class QString;
-class QWidget;
+#include <QDBusAbstractAdaptor>
 
-class Utils
+class QDBusObjectPath;
+
+namespace LXQt
 {
-public:
-    static void setParentWindow(QWidget *w, const QString &parent_window);
-    static void convertGtkMnemonic(QString &label);
-};
+    class AccessPortal : public QDBusAbstractAdaptor
+    {
+        Q_OBJECT
+        Q_CLASSINFO("D-Bus Interface", "org.freedesktop.impl.portal.Access")
+    public:
+        explicit AccessPortal(QObject *parent);
 
+    public Q_SLOTS:
+        uint AccessDialog(const QDBusObjectPath &handle,
+                const QString &app_id,
+                const QString &parent_window,
+                const QString &title,
+                const QString &subtitle,
+                const QString &body,
+                const QVariantMap &options,
+                QVariantMap &results);
+    };
+}

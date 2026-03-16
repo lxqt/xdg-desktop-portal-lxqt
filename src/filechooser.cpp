@@ -27,6 +27,7 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
+#include "choices.h"
 #include "filechooser.h"
 #include "utils.h"
 #include "filedialoghelper.h"
@@ -35,13 +36,10 @@
 #include <QDBusMetaType>
 #include <QDialogButtonBox>
 #include <QFile>
-#include <QGridLayout>
-#include <QLabel>
+#include <QLayout>
 #include <QLoggingCategory>
 #include <QMimeDatabase>
 #include <QUrl>
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDBusObjectPath>
 #include <libfm-qt6/filedialog.h>
 
@@ -50,11 +48,6 @@ Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Filter)
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Filters)
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::FilterList)
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::FilterListList)
-// used for options - choices
-Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Choice)
-Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Choices)
-Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Option)
-Q_DECLARE_METATYPE(LXQt::FileChooserPortal::OptionList)
 
 namespace LXQt
 {
@@ -103,50 +96,6 @@ namespace LXQt
         return arg;
     }
 
-    QDBusArgument &operator<<(QDBusArgument &arg, const FileChooserPortal::Choice &choice)
-    {
-        arg.beginStructure();
-        arg << choice.id << choice.value;
-        arg.endStructure();
-        return arg;
-    }
-
-    const QDBusArgument &operator>>(const QDBusArgument &arg, FileChooserPortal::Choice &choice)
-    {
-        QString id;
-        QString value;
-        arg.beginStructure();
-        arg >> id >> value;
-        choice.id = id;
-        choice.value = value;
-        arg.endStructure();
-        return arg;
-    }
-
-    QDBusArgument &operator<<(QDBusArgument &arg, const FileChooserPortal::Option &option)
-    {
-        arg.beginStructure();
-        arg << option.id << option.label << option.choices << option.initialChoiceId;
-        arg.endStructure();
-        return arg;
-    }
-
-    const QDBusArgument &operator>>(const QDBusArgument &arg, FileChooserPortal::Option &option)
-    {
-        QString id;
-        QString label;
-        FileChooserPortal::Choices choices;
-        QString initialChoiceId;
-        arg.beginStructure();
-        arg >> id >> label >> choices >> initialChoiceId;
-        option.id = id;
-        option.label = label;
-        option.choices = choices;
-        option.initialChoiceId = initialChoiceId;
-        arg.endStructure();
-        return arg;
-    }
-
     FileChooserPortal::FileChooserPortal(QObject *parent)
         : QDBusAbstractAdaptor(parent)
     {
@@ -154,10 +103,7 @@ namespace LXQt
         qDBusRegisterMetaType<Filters>();
         qDBusRegisterMetaType<FilterList>();
         qDBusRegisterMetaType<FilterListList>();
-        qDBusRegisterMetaType<Choice>();
-        qDBusRegisterMetaType<Choices>();
-        qDBusRegisterMetaType<Option>();
-        qDBusRegisterMetaType<OptionList>();
+        registerChoiceMetaTypes();
     }
 
     FileChooserPortal::~FileChooserPortal()
@@ -422,85 +368,12 @@ namespace LXQt
         return 1;
     }
 
-    QWidget *FileChooserPortal::CreateChoiceControls(const FileChooserPortal::OptionList &optionList,
-            QMap<QString, QCheckBox *> &checkboxes,
-            QMap<QString, QComboBox *> &comboboxes)
-    {
-        if (optionList.empty()) {
-            return nullptr;
-        }
-
-        QWidget *optionsWidget = new QWidget;
-        QGridLayout *layout = new QGridLayout(optionsWidget);
-        // set stretch for (unused) column 2 so controls only take the space they actually need
-        layout->setColumnStretch(2, 1);
-        optionsWidget->setLayout(layout);
-
-        for (const Option &option : optionList) {
-            const int nextRow = layout->rowCount();
-            // empty list of choices -> boolean choice according to the spec
-            if (option.choices.empty()) {
-                QCheckBox *checkbox = new QCheckBox(option.label, optionsWidget);
-                checkbox->setChecked(option.initialChoiceId == QStringLiteral("true"));
-                layout->addWidget(checkbox, nextRow, 1);
-                checkboxes.insert(option.id, checkbox);
-            } else {
-                QComboBox *combobox = new QComboBox(optionsWidget);
-                for (const Choice &choice : option.choices) {
-                    combobox->addItem(choice.value, choice.id);
-                    // select this entry if initialChoiceId matches
-                    if (choice.id == option.initialChoiceId) {
-                        combobox->setCurrentIndex(combobox->count() - 1);
-                    }
-                }
-                QString labelText = option.label;
-                if (!labelText.endsWith(QChar::fromLatin1(':'))) {
-                    labelText += QChar::fromLatin1(':');
-                }
-                QLabel *label = new QLabel(labelText, optionsWidget);
-                label->setBuddy(combobox);
-                layout->addWidget(label, nextRow, 0, Qt::AlignRight);
-                layout->addWidget(combobox, nextRow, 1);
-                comboboxes.insert(option.id, combobox);
-            }
-        }
-
-        return optionsWidget;
-    }
-
-    QVariant FileChooserPortal::EvaluateSelectedChoices(const QMap<QString, QCheckBox *> &checkboxes, const QMap<QString, QComboBox *> &comboboxes)
-    {
-        Choices selectedChoices;
-        const auto checkboxKeys = checkboxes.keys();
-        for (const QString &id : checkboxKeys) {
-            Choice choice;
-            choice.id = id;
-            choice.value = checkboxes.value(id)->isChecked() ? QStringLiteral("true") : QStringLiteral("false");
-            selectedChoices << choice;
-        }
-        const auto comboboxKeys = comboboxes.keys();
-        for (const QString &id : comboboxKeys) {
-            Choice choice;
-            choice.id = id;
-            choice.value = comboboxes.value(id)->currentData().toString();
-            selectedChoices << choice;
-        }
-
-        return QVariant::fromValue<Choices>(selectedChoices);
-    }
-
     QString FileChooserPortal::ExtractAcceptLabel(const QVariantMap &options)
     {
         QString acceptLabel;
         if (options.contains(QStringLiteral("accept_label"))) {
             acceptLabel = options.value(QStringLiteral("accept_label")).toString();
-            // 'accept_label' allows mnemonic underlines, but Qt uses '&' character, so replace/escape accordingly
-            // to keep literal '&'s and transform mnemonic underlines to the Qt equivalent using '&' for mnemonic
-            acceptLabel.replace(QChar::fromLatin1('&'), QStringLiteral("&&"));
-            const int mnemonic_pos = acceptLabel.indexOf(QChar::fromLatin1('_'));
-            if (mnemonic_pos != -1) {
-                acceptLabel.replace(mnemonic_pos, 1, QChar::fromLatin1('&'));
-            }
+            Utils::convertGtkMnemonic(acceptLabel);
         }
         return acceptLabel;
     }

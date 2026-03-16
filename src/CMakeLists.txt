@@ -1,5 +1,7 @@
 set(SRCS
     utils.cpp
+    access.cpp
+    choices.cpp
     filedialoghelper.cpp
     filechooser.cpp
     desktopportal.cpp
