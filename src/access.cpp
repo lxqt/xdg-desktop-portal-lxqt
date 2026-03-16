@@ -40,6 +40,7 @@
 #include <QLabel>
 #include <QLoggingCategory>
 #include <QPushButton>
+#include <QToolButton>
 #include <QVBoxLayout>
 
 namespace LXQt
@@ -113,10 +114,12 @@ namespace LXQt
             const QString iconName = options.value(QStringLiteral("icon")).toString();
             const QIcon icon = QIcon::fromTheme(iconName);
             if (!icon.isNull()) {
-                QLabel *iconLabel = new QLabel(&dialog);
-                iconLabel->setPixmap(icon.pixmap(48, 48));
-                iconLabel->setAlignment(Qt::AlignCenter);
-                layout->addWidget(iconLabel);
+                QToolButton *iconWidget = new QToolButton(&dialog);
+                iconWidget->setIcon(icon);
+                iconWidget->setIconSize(QSize(48, 48));
+                iconWidget->setAutoRaise(true);
+                iconWidget->setFocusPolicy(Qt::NoFocus);
+                layout->addWidget(iconWidget, 0, Qt::AlignCenter);
             }
         }
 
