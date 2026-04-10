@@ -1,3 +1,8 @@
+xdg-desktop-portal-lxqt-1.4.0 / 2026-04-20
+==========================================
+ * Added support for setting parent window on Wayland.
+ * Added access portal and refactored shared choice types.
+
 xdg-desktop-portal-lxqt-1.3.0 / 2025-11-05
 ==========================================
  * Use native systemd service.
