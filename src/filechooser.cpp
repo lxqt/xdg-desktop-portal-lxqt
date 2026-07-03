@@ -49,6 +49,8 @@ Q_DECLARE_METATYPE(LXQt::FileChooserPortal::Filters)
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::FilterList)
 Q_DECLARE_METATYPE(LXQt::FileChooserPortal::FilterListList)
 
+using namespace Qt::Literals::StringLiterals;
+
 namespace LXQt
 {
     Q_LOGGING_CATEGORY(XdgDesktopPortalLxqtFileChooser, "xdp-lxqt-file-chooser")
@@ -437,7 +439,7 @@ namespace LXQt
 
         if (mime.isValid()) {
             if (mime.isDefault()) {
-                return QStringList("*");
+                return QStringList(u"*"_s);
             }
             return mime.globPatterns();
         }
