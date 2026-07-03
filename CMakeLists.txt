@@ -5,6 +5,7 @@ set(PROJECT_VERSION "1.4.0")
 project(xdg-desktop-portal-lxqt VERSION ${PROJECT_VERSION})
 
 set(QT_MIN_VERSION "6.6.0")
+set(LXQTBT_MINIMUM_VERSION "2.4.0")
 set(LIBFMQT_MINIMUM_VERSION "2.4.0")
 set(KF6_MIN_VERSION "6.0.0")
 
@@ -13,6 +14,7 @@ set(CMAKE_AUTOMOC on)
 include(FeatureSummary)
 include(GNUInstallDirs)
 
+find_package(lxqt2-build-tools REQUIRED ${LXQTBT_MINIMUM_VERSION})
 find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Core
     DBus
@@ -25,6 +27,8 @@ endif()
 
 find_package(fm-qt6 ${LIBFMQT_MINIMUM_VERSION} REQUIRED)
 find_package(KF6WindowSystem ${KF6_MIN_VERSION} REQUIRED)
+
+include(LXQtCompilerSettings NO_POLICY_SCOPE)
 
 add_subdirectory(data)
 add_subdirectory(src)

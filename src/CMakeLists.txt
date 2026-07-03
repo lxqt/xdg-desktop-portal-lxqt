@@ -14,9 +14,6 @@ include_directories(
 
 add_executable(xdg-desktop-portal-lxqt ${SRCS})
 
-set_property(TARGET xdg-desktop-portal-lxqt PROPERTY CXX_STANDARD 14)
-set_property(TARGET xdg-desktop-portal-lxqt PROPERTY CXX_STANDARD_REQUIRED on)
-
 target_link_libraries(xdg-desktop-portal-lxqt
     Qt6::Core
     Qt6::DBus
