@@ -8,18 +8,17 @@ set(SRCS
     main.cpp
 )
 
-include_directories(
-    ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
-)
-
 add_executable(xdg-desktop-portal-lxqt ${SRCS})
 
 target_link_libraries(xdg-desktop-portal-lxqt
-    Qt6::Core
-    Qt6::DBus
-    Qt6::Widgets
-    fm-qt6
-    KF6::WindowSystem
+    PUBLIC
+        Qt6::Core
+        Qt6::DBus
+        Qt6::Widgets
+        fm-qt6
+        KF6::WindowSystem
+    PRIVATE
+        Qt6::GuiPrivate
 )
 
 install(TARGETS xdg-desktop-portal-lxqt DESTINATION ${CMAKE_INSTALL_FULL_LIBEXECDIR})
