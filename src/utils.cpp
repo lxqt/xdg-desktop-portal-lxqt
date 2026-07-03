@@ -51,9 +51,9 @@ void Utils::convertGtkMnemonic(QString &label)
 {
     // Mnemonic underlines (GTK style) use '_', but Qt uses '&'. Escape literal '&'s
     // and transform the first mnemonic underline to the Qt equivalent.
-    label.replace(QChar::fromLatin1('&'), QStringLiteral("&&"));
-    const int mnemonicPos = label.indexOf(QChar::fromLatin1('_'));
+    label.replace(u'&', QStringLiteral("&&"));
+    const int mnemonicPos = label.indexOf(u'_');
     if (mnemonicPos != -1) {
-        label.replace(mnemonicPos, 1, QChar::fromLatin1('&'));
+        label.replace(mnemonicPos, 1, u'&');
     }
 }

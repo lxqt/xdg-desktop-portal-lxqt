@@ -122,8 +122,8 @@ namespace LXQt
                     }
                 }
                 QString labelText = option.label;
-                if (!labelText.endsWith(QChar::fromLatin1(':'))) {
-                    labelText += QChar::fromLatin1(':');
+                if (!labelText.endsWith(u':')) {
+                    labelText += u':';
                 }
                 QLabel *label = new QLabel(labelText, optionsWidget);
                 label->setBuddy(combobox);
